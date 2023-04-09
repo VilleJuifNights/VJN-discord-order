@@ -22,7 +22,7 @@ identifiant = 1
 @bot.command()
 async def start(ctx, secondes = 5):
     '''
-    function to display messages stored in the list called status from the bot
+    function to display messages stored in the list called status
     '''
     changeStatus.change_interval(seconds = secondes)
 
