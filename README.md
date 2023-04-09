@@ -6,7 +6,7 @@ This bot allows you to order crepes and other food during Villejuif nights via D
 
 ### Cloning the repo
 ```sh
-git@github.com:VilleJuifNights/VJN-discord-order.git
+git clone git@github.com:VilleJuifNights/VJN-discord-order.git
 ```
 
 ### Installing the right packages
