@@ -2,7 +2,7 @@
 
 This bot allows you to order crepes and other food during Villejuif nights via Discord
 
-##How to contribute to the bot ?
+## How to contribute to the bot ?
 
 ### Cloning the repo
 ```sh
