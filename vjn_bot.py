@@ -42,7 +42,6 @@ async def commander(interaction: discord.Interaction, choix: app_commands.Choice
     if choix == "soda":
         link = "https://boutique.sofratel.fr/laon/wp-content/uploads/sites/17/2021/12/boissons33cl.jpg"
     title = "Commande n°" + str(identifiant) + "\ncommandé à " + datetime.now().strftime("%H:%M")
-    commandes[identifiant] = (choix, people, title)
     emb = discord.Embed(title=title, description=f"{interaction.user.mention} a commandé des {choix}", color=0x3498db)
     message = discord.Embed(title=title, description=f"Tu a commandé : {choix}", color=0x3498db)
     if (link != ""):
@@ -50,7 +49,8 @@ async def commander(interaction: discord.Interaction, choix: app_commands.Choice
     await channel.send(embed=emb)
     await people.send(embed=message)
     await people.send("Il faut maintenant que tu viennes au stand pour pouvoir valider et préparer ta commande")
-    await interaction.response.send_message("Ta commande a bien été enregistré")
+    message_sent = await interaction.response.send_message("Ta commande a bien été enregistré")
+    commandes[identifiant] = (choix, people, title, message_sent.position)
     identifiant += 1
 
 @tree.command(name="valider")
@@ -63,18 +63,24 @@ async def valider(interaction: discord.Interaction, nombre:int):
         channel = client.get_channel(int(commands_channel.read()))
     real_messages = []
     messages = channel.history(limit=None)
-    async for message in messages:
-        real_messages.append(message)
-    for i in range(len(real_messages)):
-        if i == nombre-1:
-            (_, people, title) = commandes[nombre]
-            now = datetime.now().strftime("%H:%M")
-            new_emb = discord.Embed(title=title, description=f"Commande n°{nombre} validé par {interaction.user.mention} à {now}", color=0x51ff00)
-            await real_messages[i].edit(embed=new_emb)
-            await people.send(f"Ta commande n°{nombre} a bien été validé et est en préparation.\nNous te renverrons un message lorsque ta commande sera prête")
-            await interaction.response.send_message(f"La commande n°{nombre} a bien été validé")
+    if len(commandes) > 0:
+        async for message in messages:
+            real_messages.append(message)
+        length = len(real_messages)
+        print(real_messages, length)
+        if length > 0 and nombre in commandes.keys():
+            (_, people, title, location) = commandes[nombre]
+            for i in range(length):
+                if message[i].position == location:
+                    now = datetime.now().strftime("%H:%M")
+                    new_emb = discord.Embed(title=title, description=f"Commande n°{nombre} validé par {interaction.user.mention} à {now}", color=0x51ff00)
+                    await real_messages[i].edit(embed=new_emb)
+                    await people.send(f"Ta commande n°{nombre} a bien été validé et est en préparation.\nNous te renverrons un message lorsque ta commande sera prête")
+                    await interaction.response.send_message(f"La commande n°{nombre} a bien été validé")
         else:
-            await interaction.response.send_message("Je n'ai pas la trouvé de commande portant ce numéro")
+            await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
+    else:
+        await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
 
 with open('token_bot.txt', 'r') as token:
     client.run(token.read())
