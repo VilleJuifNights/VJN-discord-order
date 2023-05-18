@@ -11,7 +11,8 @@ async def on_ready():
     '''
     show if there is no error and start the RPC
     '''
-    print("ready")
+    print("Ready")
+    await tree.sync()
     game = Game(name="/commander")
     activity = Activity(name="Playing", type=ActivityType.playing)
     await client.change_presence(activity=game)
@@ -81,6 +82,18 @@ async def valider(interaction: discord.Interaction, nombre:int):
             await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
     else:
         await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
+
+@tree.command(name="add_button")
+@app_commands.describe(identifiant="l'identifiant de la channel où mettre le bouton")
+async def add_button(interaction: discord.Interaction, identifiant:str):
+    channel = client.get_channel(int(identifiant))
+
+    button = discord.ui.Button(style=discord.ButtonStyle.primary, label='Click Me!', custom_id='button_clicked')
+
+    view = discord.ui.View()
+    view.add_item(button)
+
+    await channel.send(content='Here is a message with a button:', view=view) 
 
 with open('token_bot.txt', 'r') as token:
     client.run(token.read())
