@@ -95,5 +95,16 @@ async def add_button(interaction: discord.Interaction, identifiant:str):
 
     await channel.send(content='Here is a message with a button:', view=view) 
 
+@tree.command(name="clear")
+@app_commands.describe(number="le nombre de message que tu veux supprimer")
+async def clear(interaction: discord.Interaction, number : int):
+        list_messages = interaction.channel.history(limit = number + 1)
+        messages = []
+
+        async for message in list_messages:
+            messages.append(message)
+        for message in messages:
+            await(message.delete())
+
 with open('token_bot.txt', 'r') as token:
     client.run(token.read())
