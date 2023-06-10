@@ -19,6 +19,7 @@ async def on_ready():
 
 commandes = {}
 identifiant_commande = 1
+start_commande = 0
 
 @tree.command(name="order")
 @app_commands.describe(choix="pour commander des trucs bons")
@@ -86,29 +87,70 @@ async def validate(interaction: discord.Interaction, nombre:int):
 @tree.command(name="add_button")
 @app_commands.describe(identifiant="l'identifiant de la channel où mettre le bouton")
 async def add_button(interaction: discord.Interaction, identifiant: str):
-    channel = client.get_channel(int(identifiant)) 
+    channel = client.get_channel(int(identifiant))
+    start_commande = int(identifiant)
 
     async def usuelle_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        
+        
         nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id="nutella")
         specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spécullos", custom_id="specullos")
         sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="sucre", custom_id="sucre")
         emmJamb = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-jambon", custom_id="emmJamb")
         emmPoul = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-poulet", custom_id="emmPoul")
-        
-        ingredients = [nutella, specullos, sucre, emmJamb, emmPoul]
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+
+        ingredients = [nutella, specullos, sucre, emmJamb, emmPoul, back, cancel]
 
         usuelle_view = discord.ui.View()
         for elt in ingredients:
-            uselle_view.add_item(elt)
+            if elt.custom_id == "back":
+                elt.callback = crepe_callback
+            if elt.custom_id == "cancel":
+                elt.callback = cancel_callback
+            usuelle_view.add_item(elt)
+
+        await interaction.response.send_message("Choisis l'ingrédient que tu veux dans ta crêpe", view=usuelle_view)
 
     async def crepe_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+
         usuelle = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe usuelle", custom_id="usuelle")
         usuelle.callback = usuelle_callback
+        
         combinaison = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe combinaison", custom_id="combinaison")
+        
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="Revenir au choix précédent", custom_id="back")
+        back.callback = button_callback
+        
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        
         crepe_view = discord.ui.View()
         crepe_view.add_item(usuelle)
         crepe_view.add_item(combinaison)
-        
+        crepe_view.add_item(back)
+        crepe_view.add_item(cancel)
+
         await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
 
     async def cancel_callback(interaction : discord.Interaction):
@@ -122,8 +164,21 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
     async def button_callback(interaction: discord.Interaction):
         guild = interaction.guild
-        new_channel_name = "commande_" + str(identifiant_commande)
-        new_channel = await guild.create_text_channel(new_channel_name)
+        if interaction.channel_id == start_commande:
+            new_channel_name = "commande_" + str(identifiant_commande)
+            new_channel = await guild.create_text_channel(new_channel_name)
+        else:
+            new_channel = client.get_channel(interaction.channel_id)
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
 
         crepe = discord.ui.Button(style=discord.ButtonStyle.primary, label='Crêpe', custom_id="crepe")
         churros = discord.ui.Button(style=discord.ButtonStyle.primary, label='Churros', custom_id="churros")
