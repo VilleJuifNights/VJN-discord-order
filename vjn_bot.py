@@ -35,7 +35,7 @@ async def order(interaction: discord.Interaction, choix: app_commands.Choice[str
     '''
     to order food
     '''
-    global identifiant_commade
+    global identifiant_commande
     choix = choix.value
     with open("commands_channel.txt", "r") as commands_channel:
         channel = client.get_channel(int(commands_channel.read()))
@@ -89,6 +89,36 @@ async def validate(interaction: discord.Interaction, nombre:int):
 async def add_button(interaction: discord.Interaction, identifiant: str):
     channel = client.get_channel(int(identifiant))
     start_commande = int(identifiant)
+    
+    async def combinaison_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe sucré", custom_id="sucre")
+
+        sel = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe salé", custom_id="sel")
+
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        back.callback = back_callback
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        combinaison_view = discord.ui.View()
+        
+        combinaison_view.add_item(sucre)
+        combinaison_view.add_item(sel)
+        combinaison_view.add_item(back)
+        combinaison_view.add_item(cancel)
+
+        await interaction.response.send_message("Veuillez choisir le type de crêpe combinaison que vous voulez", view=combinaison_view)
 
     async def usuelle_callback(interaction : discord.Interaction):
         list_messages = interaction.channel.history(limit = 1)
@@ -101,7 +131,6 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
            for message in messages:
                await(message.delete())
 
-        
         
         nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id="nutella")
         specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spécullos", custom_id="specullos")
@@ -139,6 +168,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         usuelle.callback = usuelle_callback
         
         combinaison = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe combinaison", custom_id="combinaison")
+        combinaison.callback = combinaison_callback
         
         back = discord.ui.Button(style=discord.ButtonStyle.primary, label="Revenir au choix précédent", custom_id="back")
         back.callback = button_callback
@@ -169,15 +199,15 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
             new_channel = await guild.create_text_channel(new_channel_name)
         else:
             new_channel = client.get_channel(interaction.channel_id)
-        list_messages = interaction.channel.history(limit = 1)
-        messages = []
+            list_messages = interaction.channel.history(limit = 1)
+            messages = []
         
-        async for message in list_messages:
-            messages.append(message)
+            async for message in list_messages:
+                messages.append(message)
 
-        if len(messages) > 0:
-           for message in messages:
-               await(message.delete())
+            if len(messages) > 0:
+                for message in messages:
+                    await(message.delete())
 
 
         crepe = discord.ui.Button(style=discord.ButtonStyle.primary, label='Crêpe', custom_id="crepe")
@@ -196,7 +226,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
             new_view.add_item(elt)
         await new_channel.send(content='Choisis ce que tu veux prendre parmi les bouttons ci-dessous', view=new_view)
 
-    button = discord.ui.Button(style=discord.ButtonStyle.primary, label='Click Me!', custom_id='button_clicked')
+    button = discord.ui.Button(style=discord.ButtonStyle.primary, label='Commande ici!', custom_id='button_clicked')
     button.callback = button_callback
 
     view = discord.ui.View()
