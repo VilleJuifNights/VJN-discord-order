@@ -90,107 +90,6 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
     channel = client.get_channel(int(identifiant))
     start_commande = int(identifiant)
     
-    async def combinaison_callback(interaction : discord.Interaction):
-        list_messages = interaction.channel.history(limit = 1)
-        messages = []
-        
-        async for message in list_messages:
-            messages.append(message)
-
-        if len(messages) > 0:
-           for message in messages:
-               await(message.delete())
-
-        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe sucré", custom_id="sucre")
-
-        sel = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe salé", custom_id="sel")
-
-        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
-        back.callback = back_callback
-
-        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
-        cancel.callback = cancel_callback
-
-        combinaison_view = discord.ui.View()
-        
-        combinaison_view.add_item(sucre)
-        combinaison_view.add_item(sel)
-        combinaison_view.add_item(back)
-        combinaison_view.add_item(cancel)
-
-        await interaction.response.send_message("Veuillez choisir le type de crêpe combinaison que vous voulez", view=combinaison_view)
-
-    async def usuelle_callback(interaction : discord.Interaction):
-        list_messages = interaction.channel.history(limit = 1)
-        messages = []
-        
-        async for message in list_messages:
-            messages.append(message)
-
-        if len(messages) > 0:
-           for message in messages:
-               await(message.delete())
-
-        
-        nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id="nutella")
-        specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spécullos", custom_id="specullos")
-        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="sucre", custom_id="sucre")
-        emmJamb = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-jambon", custom_id="emmJamb")
-        emmPoul = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-poulet", custom_id="emmPoul")
-        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
-        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
-
-        ingredients = [nutella, specullos, sucre, emmJamb, emmPoul, back, cancel]
-
-        usuelle_view = discord.ui.View()
-        for elt in ingredients:
-            if elt.custom_id == "back":
-                elt.callback = crepe_callback
-            if elt.custom_id == "cancel":
-                elt.callback = cancel_callback
-            usuelle_view.add_item(elt)
-
-        await interaction.response.send_message("Choisis l'ingrédient que tu veux dans ta crêpe", view=usuelle_view)
-
-    async def crepe_callback(interaction : discord.Interaction):
-        list_messages = interaction.channel.history(limit = 1)
-        messages = []
-        
-        async for message in list_messages:
-            messages.append(message)
-
-        if len(messages) > 0:
-           for message in messages:
-               await(message.delete())
-
-
-        usuelle = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe usuelle", custom_id="usuelle")
-        usuelle.callback = usuelle_callback
-        
-        combinaison = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe combinaison", custom_id="combinaison")
-        combinaison.callback = combinaison_callback
-        
-        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="Revenir au choix précédent", custom_id="back")
-        back.callback = button_callback
-        
-        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
-        
-        crepe_view = discord.ui.View()
-        crepe_view.add_item(usuelle)
-        crepe_view.add_item(combinaison)
-        crepe_view.add_item(back)
-        crepe_view.add_item(cancel)
-
-        await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
-
-    async def cancel_callback(interaction : discord.Interaction):
-        guild = interaction.guild
-        index = 0
-
-        while index < len(guild.channels) and guild.channels[index].name != "commande_" + str(identifiant_commande):
-           index += 1
-        await guild.channels[index].delete()
-        await interaction.response.send_message("Votre commande a bien été annulé", ephemeral=True)
 
     async def button_callback(interaction: discord.Interaction):
         guild = interaction.guild
@@ -226,6 +125,225 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
             new_view.add_item(elt)
         await new_channel.send(content='Choisis ce que tu veux prendre parmi les bouttons ci-dessous', view=new_view)
 
+    
+    async def crepe_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+
+        usuelle = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe usuelle", custom_id="usuelle")
+        usuelle.callback = usuelle_callback
+        
+        combinaison = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe combinaison", custom_id="combinaison")
+        combinaison.callback = combinaison_callback
+        
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="Revenir au choix précédent", custom_id="back")
+        back.callback = button_callback
+        
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        
+        crepe_view = discord.ui.View()
+        crepe_view.add_item(usuelle)
+        crepe_view.add_item(combinaison)
+        crepe_view.add_item(back)
+        crepe_view.add_item(cancel)
+
+        await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
+
+    
+    async def usuelle_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        
+        nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id="nutella")
+        specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spécullos", custom_id="specullos")
+        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="sucre", custom_id="sucre")
+        emmJamb = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-jambon", custom_id="emmJamb")
+        emmPoul = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-poulet", custom_id="emmPoul")
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+
+        ingredients = [nutella, specullos, sucre, emmJamb, emmPoul, back, cancel]
+
+        usuelle_view = discord.ui.View()
+        for elt in ingredients:
+            if elt.custom_id == "back":
+                elt.callback = crepe_callback
+            if elt.custom_id == "cancel":
+                elt.callback = cancel_callback
+            usuelle_view.add_item(elt)
+
+        await interaction.response.send_message("Choisis l'ingrédient que tu veux dans ta crêpe", view=usuelle_view)
+
+    
+    async def combinaison_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe sucré", custom_id="sucre")
+
+        sel = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe salé", custom_id="sel")
+        sel.callback = sale_callback
+
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        back.callback = crepe_callback
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        combinaison_view = discord.ui.View()
+        
+        combinaison_view.add_item(sucre)
+        combinaison_view.add_item(sel)
+        combinaison_view.add_item(back)
+        combinaison_view.add_item(cancel)
+
+        await interaction.response.send_message("Veuillez choisir le type de crêpe combinaison que vous voulez", view=combinaison_view)
+
+
+    async def sale_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        emb = discord.Embed(title="Les ingrédients possibles pour une crêpe salé", color=0x3498db)
+        emb.add_field(name="1 euro", value="- Emmental\n- Chèvre\n- Poulet\n- Jambon\n- Viande hachée\n- Thon\n -Saucisson")
+        emb.add_field(name="50 centimes", value="- Crème fraîche\n- Oignon\n- œuf\n- Champignon\n- Salade\n- Tomate")
+        emb.add_field(name="gratuit", value="- Chantilly\n- Citron\n- Beurre\n- Toping")
+
+        un_euro = discord.ui.Button(style=discord.ButtonStyle.primary, label="1 euro", custom_id="un_euro")
+
+        cinquante_cent = discord.ui.Button(style=discord.ButtonStyle.primary, label="50 centimes", custom_id="cinquante_cent")
+
+        gratos = discord.ui.Button(style=discord.ButtonStyle.primary, label="gratuit", custom_id="gratos")
+
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        back.callback = combinaison_callback
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        sale_view = discord.ui.View()
+
+        sale_view.add_item(un_euro)
+        sale_view.add_item(cinquante_cent)
+        sale_view.add_item(gratos)
+        sale_view.add_item(back)
+        sale_view.add_item(cancel)
+
+        await interaction.response.send_message("Choisis les ingrédients que tu veux ajouter à ta crêpe", embed=emb, view=sale_view) 
+    
+    async def un_euro_sale_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+        
+        emmental = discord.ui.Button(style=discord.ButtonStyle.primary, label="Emmental", custom_id="emmental")
+
+        chevre = discord.ui.Button(style=discord.ButtonStyle.primary, label="Chèvre", custom_id="chevre")
+
+        poulet = discord.ui.Button(style=discord.ButtonStyle.primary, label="Poulet", custom_id="Poulet")
+
+        jambon = discord.ui.Button(style=discord.ButtonStyle.primary, label="Jambon", custom_id="jambon")
+
+        minced = discord.ui.Button(style=discord.ButtonStyle.primary, label="Viande hachée", custom_id="minced")
+
+        thon = discord.ui.Button(style=discord.ButtonStyle.primary, label="Thon", custom_id="thon")
+
+        saucisson = discord.ui.Button(style=discord.ButtonStyle.primary, label="Saucisson", custom_id="saucisson")
+
+        ingredients = [emmental, chevre, poulet, jambon, minced, thon, saucisson]
+
+        un_euro_sale_view = discord.ui.View()
+        for elt in ingredients:
+           un_euro_sale_view.add_item(elt)
+
+        interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe")
+
+    
+    async def sucre_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        emb = discord.Embed(title="Les ingrédients possibles pour une crêpe sucré", color=0x3498db)
+        emb.add_field(name="1 euro", value="- Sirop d'érable\n- Beurre de cacahuète\n- Nutella\n- Milka\n- Spécullos\n- Fraise (le fruit)\n- confiture d'Abricot\n- Miel\n- Caramel")
+        emb.add_field(name="50 centimes", value="- Confiture de fraise/abricot\n- banane")
+        emb.add_field(name="gratuit", value="- Chantilly\n- Citron\n- Beurre\n- Toping")
+        
+        un_euro = discord.ui.Button(style=discord.ButtonStyle.primary, label="1 euro", custom_id="un_euro")
+
+        cinquante_cent = discord.ui.Button(style=discord.ButtonStyle.primary, label="50 centimes", custom_id="cinquante_cent")
+
+        gratos = discord.ui.Button(style=discord.ButtonStyle.primary, label="gratuit", custom_id="gratos")
+
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        back.callback = combinaison_callback
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        sucre_view = discord.ui.View()
+
+        sucre_view.add_item(un_euro)
+        sucre_view.add_item(cinquante_cent)
+        sucre_view.add_item(gratos)
+        sucre_view.add_item(back)
+        sucre_view.add_item(cancel)
+
+        await interaction.response.send_message("Choisis les ingrédients que tu veux ajouter à ta crêpe", embed=emb, view=sale_view) 
+
+
+    async def cancel_callback(interaction : discord.Interaction):
+        guild = interaction.guild
+        index = 0
+
+        while index < len(guild.channels) and guild.channels[index].name != "commande_" + str(identifiant_commande):
+           index += 1
+        await guild.channels[index].delete()
+        await interaction.response.send_message("Votre commande a bien été annulé", ephemeral=True)
+
+    
     button = discord.ui.Button(style=discord.ButtonStyle.primary, label='Commande ici!', custom_id='button_clicked')
     button.callback = button_callback
 
@@ -233,6 +351,8 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
     view.add_item(button)
 
     await channel.send(content='Here is a message with a button:', view=view)
+
+
 
 @tree.command(name="clear")
 @app_commands.describe(number="le nombre de message que tu veux supprimer")
@@ -244,6 +364,8 @@ async def clear(interaction: discord.Interaction, number : int):
             messages.append(message)
         for message in messages:
             await(message.delete())
+
+
 
 with open('token_bot.txt', 'r') as token:
     client.run(token.read())
