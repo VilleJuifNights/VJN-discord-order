@@ -348,7 +348,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         for elt in ingredients:
             cinquante_cent_sale_view.add_item(elt)
 
-        interaction.response.send_message("Choisis l'ingrédient que tu veux ajouter à ta crêpe")
+        await interaction.response.send_message("Choisis l'ingrédient que tu veux ajouter à ta crêpe", view=cinquante_cent_sale_view)
 
     async def sucre_callback(interaction : discord.Interaction):
         list_messages = interaction.channel.history(limit = 1)
