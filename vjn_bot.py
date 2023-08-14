@@ -84,12 +84,25 @@ async def validate(interaction: discord.Interaction, nombre:int):
     else:
         await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
 
+def prettyDisplay(liste):
+    unique = []
+    output = []
+    contenu = ""
+    for elt in liste:
+        if elt not in unique:
+            unique.append(elt)
+            output.append((liste.count(elt), elt))
+    for (num, elt) in output:
+        contenu += f"- {elt} : {num}\n"
+    emb = discord.Embed(title="Votre commande actuelle", description=contenu, color=0x3498db)
+    return emb
+
 @tree.command(name="add_button", description="ajouter le bouton pour que les clients commandent")
 @app_commands.describe(identifiant="l'identifiant de la channel où mettre le bouton")
 async def add_button(interaction: discord.Interaction, identifiant: str):
     channel = client.get_channel(int(identifiant))
     start_commande = int(identifiant)
-    
+    commande = []
 
     async def button_callback(interaction: discord.Interaction):
         guild = interaction.guild
@@ -103,7 +116,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
             if not already:
                 new_channel = await guild.create_text_channel(new_channel_name)
             else: 
-                await interaction.response.send_message(f"Tu as déjà lancer une commande. Pour continuer à commander, il te suffit d'aller au channel: {channel.mention}", ephemeral=True)
+                await interaction.response.send_message(f"Tu as déjà lancé une commande. Pour continuer à commander, il te suffit d'aller au channel: {channel.mention}", ephemeral=True)
         else:
             new_channel = client.get_channel(interaction.channel_id)
             list_messages = interaction.channel.history(limit = 1)
@@ -128,10 +141,14 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         for elt in buttons:
             if elt.custom_id == "crepe":
                 elt.callback = crepe_callback
+            elif elt.custom_id == "churros":
+                elt.callback = churros_callback
+            elif elt.custom_id == "gauffres":
+                elt.callback = gauffre_callback
             elif elt.custom_id == "cancel":
                 elt.callback = cancel_callback
             new_view.add_item(elt)
-        await new_channel.send(content='Choisis ce que tu veux prendre parmi les bouttons ci-dessous', view=new_view)
+        await new_channel.send(content='Choisis ce que tu veux prendre parmi les boutons ci-dessous', view=new_view)
 
     
     async def crepe_callback(interaction : discord.Interaction):
@@ -165,8 +182,64 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         crepe_view.add_item(cancel)
 
         await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
-
     
+    async def churros_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        commande.append("churros")
+
+        continuer = discord.ui.Button(style=discord.ButtonStyle.primary, label="continuer de commander", custom_id="continue")
+        continuer.callback = button_callback
+
+        confirm = discord.ui.Button(style=discord.ButtonStyle.primary, label="terminer et confirmer la commande", custom_id="confirm")
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        churros_view = discord.ui.View()
+        churros_view.add_item(continuer)
+        churros_view.add_item(confirm)
+        churros_view.add_item(cancel)
+
+        await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=churros_view)
+    
+    async def gauffre_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+
+        commande.append("gauffre")
+
+        continuer = discord.ui.Button(style=discord.ButtonStyle.primary, label="continuer de commander", custom_id="continue")
+        continuer.callback = button_callback
+
+        confirm = discord.ui.Button(style=discord.ButtonStyle.primary, label="terminer et confirmer la commande", custom_id="confirm")
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        gauffre_view = discord.ui.View()
+        gauffre_view.add_item(continuer)
+        gauffre_view.add_item(confirm)
+        gauffre_view.add_item(cancel)
+
+        await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=gauffre_view)
+
+
     async def usuelle_callback(interaction : discord.Interaction):
         list_messages = interaction.channel.history(limit = 1)
         messages = []
@@ -405,7 +478,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
     view = discord.ui.View()
     view.add_item(button)
 
-    await channel.send(content='Here is a message with a button:', view=view)
+    await channel.send(content='Pour commander, veuillez cliquer sur le bouton ci-dessous:', view=view)
 
 
 
