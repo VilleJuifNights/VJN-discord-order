@@ -92,7 +92,7 @@ def prettyDisplay(liste):
         if elt not in unique:
             unique.append(elt)
             output.append((liste.count(elt), elt))
-    for (num, elt) in output:
+    for (num, elt) in sorted(output, key=lambda x: x[1]):
         contenu += f"- {elt} : {num}\n"
     emb = discord.Embed(title="Votre commande actuelle", description=contenu, color=0x3498db)
     return emb
@@ -130,23 +130,21 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
                     await(message.delete())
 
 
-        crepe = discord.ui.Button(style=discord.ButtonStyle.primary, label='Crêpe', custom_id="crepe")
-        churros = discord.ui.Button(style=discord.ButtonStyle.primary, label='Churros', custom_id="churros")
-        gauffres = discord.ui.Button(style=discord.ButtonStyle.primary, label='Gauffres', custom_id="gauffres")
+        crepe = discord.ui.Button(style=discord.ButtonStyle.primary, label='Crêpe', custom_id="Crepe")
+        churros = discord.ui.Button(style=discord.ButtonStyle.primary, label='Churros', custom_id="Churros")
+        gauffres = discord.ui.Button(style=discord.ButtonStyle.primary, label='Gauffres', custom_id="Gauffres")
         BarbePapa = discord.ui.Button(style=discord.ButtonStyle.primary, label='Barbe à papa', custom_id="BarbePapa")
-        soda = discord.ui.Button(style=discord.ButtonStyle.primary, label='Soda', custom_id="soda")
+        soda = discord.ui.Button(style=discord.ButtonStyle.primary, label='Soda', custom_id="Soda")
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label='annuler la commande', custom_id="cancel")
         buttons = [crepe, churros, gauffres, BarbePapa, soda, cancel]
         new_view = discord.ui.View()
         for elt in buttons:
-            if elt.custom_id == "crepe":
+            if elt.custom_id == "Crepe":
                 elt.callback = crepe_callback
-            elif elt.custom_id == "churros":
-                elt.callback = churros_callback
-            elif elt.custom_id == "gauffres":
-                elt.callback = gauffre_callback
             elif elt.custom_id == "cancel":
                 elt.callback = cancel_callback
+            else:
+                elt.callback = lambda i=interaction, s=elt.custom_id: show_callback(i, s)
             new_view.add_item(elt)
         await new_channel.send(content='Choisis ce que tu veux prendre parmi les boutons ci-dessous', view=new_view)
 
@@ -183,7 +181,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
         await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
     
-    async def churros_callback(interaction : discord.Interaction):
+    async def show_callback(interaction : discord.Interaction, information):
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -194,7 +192,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
            for message in messages:
                await(message.delete())
 
-        commande.append("churros")
+        commande.append(information)
 
         continuer = discord.ui.Button(style=discord.ButtonStyle.primary, label="continuer de commander", custom_id="continue")
         continuer.callback = button_callback
@@ -204,42 +202,13 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
         cancel.callback = cancel_callback
 
-        churros_view = discord.ui.View()
-        churros_view.add_item(continuer)
-        churros_view.add_item(confirm)
-        churros_view.add_item(cancel)
+        commande_view = discord.ui.View()
+        commande_view.add_item(continuer)
+        commande_view.add_item(confirm)
+        commande_view.add_item(cancel)
 
-        await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=churros_view)
+        await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=commande_view)
     
-    async def gauffre_callback(interaction : discord.Interaction):
-        list_messages = interaction.channel.history(limit = 1)
-        messages = []
-        
-        async for message in list_messages:
-            messages.append(message)
-
-        if len(messages) > 0:
-           for message in messages:
-               await(message.delete())
-
-        commande.append("gauffre")
-
-        continuer = discord.ui.Button(style=discord.ButtonStyle.primary, label="continuer de commander", custom_id="continue")
-        continuer.callback = button_callback
-
-        confirm = discord.ui.Button(style=discord.ButtonStyle.primary, label="terminer et confirmer la commande", custom_id="confirm")
-
-        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
-        cancel.callback = cancel_callback
-
-        gauffre_view = discord.ui.View()
-        gauffre_view.add_item(continuer)
-        gauffre_view.add_item(confirm)
-        gauffre_view.add_item(cancel)
-
-        await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=gauffre_view)
-
-
     async def usuelle_callback(interaction : discord.Interaction):
         list_messages = interaction.channel.history(limit = 1)
         messages = []
@@ -465,6 +434,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
     async def cancel_callback(interaction : discord.Interaction):
         guild = interaction.guild
         index = 0
+        commande = []
 
         while index < len(guild.channels) and guild.channels[index].name != "commande_" + str(identifiant_commande):
            index += 1
