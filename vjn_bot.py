@@ -133,7 +133,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         crepe = discord.ui.Button(style=discord.ButtonStyle.primary, label='Crêpe', custom_id="Crepe")
         churros = discord.ui.Button(style=discord.ButtonStyle.primary, label='Churros', custom_id="Churros")
         gauffres = discord.ui.Button(style=discord.ButtonStyle.primary, label='Gauffres', custom_id="Gauffres")
-        BarbePapa = discord.ui.Button(style=discord.ButtonStyle.primary, label='Barbe à papa', custom_id="BarbePapa")
+        BarbePapa = discord.ui.Button(style=discord.ButtonStyle.primary, label='Barbe à papa', custom_id="Barbe à papa")
         soda = discord.ui.Button(style=discord.ButtonStyle.primary, label='Soda', custom_id="Soda")
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label='annuler la commande', custom_id="cancel")
         buttons = [crepe, churros, gauffres, BarbePapa, soda, cancel]
@@ -220,12 +220,12 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
            for message in messages:
                await(message.delete())
 
-        
-        nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id="nutella")
-        specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spécullos", custom_id="specullos")
-        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="sucre", custom_id="sucre")
-        emmJamb = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-jambon", custom_id="emmJamb")
-        emmPoul = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-poulet", custom_id="emmPoul")
+        typeCrepe = "Crêpe usuelle "
+        nutella = discord.ui.Button(style=discord.ButtonStyle.primary, label="nutella", custom_id=typeCrepe + "nutella")
+        specullos = discord.ui.Button(style=discord.ButtonStyle.primary, label="spéculos", custom_id=typeCrepe + "spéculos")
+        sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="sucre", custom_id= typeCrepe + "sucre")
+        emmJamb = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-jambon", custom_id=typeCrepe + "emmJamb")
+        emmPoul = discord.ui.Button(style=discord.ButtonStyle.primary, label="emmental-poulet", custom_id=typeCrepe + "emmPoul")
         back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
 
@@ -235,8 +235,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         for elt in ingredients:
             if elt.custom_id == "back":
                 elt.callback = crepe_callback
-            if elt.custom_id == "cancel":
+            elif elt.custom_id == "cancel":
                 elt.callback = cancel_callback
+            else:
+                elt.callback = lambda i=interaction, s=elt.custom_id: show_callback(i, s)
             usuelle_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingrédient que tu veux dans ta crêpe", view=usuelle_view)
@@ -445,7 +447,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
     button = discord.ui.Button(style=discord.ButtonStyle.primary, label='Commande ici!', custom_id='button_clicked')
     button.callback = button_callback
 
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=None)
     view.add_item(button)
 
     await channel.send(content='Pour commander, veuillez cliquer sur le bouton ci-dessous:', view=view)
