@@ -115,6 +115,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
                     already = True
             if not already:
                 new_channel = await guild.create_text_channel(new_channel_name)
+                await interaction.response.send_message(content=f"Le channel {new_channel.mention} vient d'être créer pour t'aider à commander", ephemeral=True)
             else: 
                 await interaction.response.send_message(f"Tu as déjà lancé une commande. Pour continuer à commander, il te suffit d'aller au channel: {channel.mention}", ephemeral=True)
         else:
