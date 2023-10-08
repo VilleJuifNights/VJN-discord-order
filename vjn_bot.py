@@ -97,12 +97,12 @@ def prettyDisplay(liste):
     emb = discord.Embed(title="Votre commande actuelle", description=contenu, color=0x3498db)
     return emb
 
+commande = []
 @tree.command(name="add_button", description="ajouter le bouton pour que les clients commandent")
 @app_commands.describe(identifiant="l'identifiant de la channel où mettre le bouton")
 async def add_button(interaction: discord.Interaction, identifiant: str):
     channel = client.get_channel(int(identifiant))
     start_commande = int(identifiant)
-    commande = []
 
     async def button_callback(interaction: discord.Interaction):
         guild = interaction.guild
@@ -239,7 +239,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
             elif elt.custom_id == "cancel":
                 elt.callback = cancel_callback
             else:
-                elt.callback = lambda i=interaction, s=elt.custom_id: show_callback(i, s)
+                elt.callback = lambda i=interaction, s=typeCrepe + elt.label: show_callback(i, s)
             usuelle_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingrédient que tu veux dans ta crêpe", view=usuelle_view)
@@ -301,6 +301,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         cinquante_cent.callback = cinquante_cent_sale_callback
 
         gratos = discord.ui.Button(style=discord.ButtonStyle.primary, label="gratuit", custom_id="gratos")
+        gratos.callback = lambda i=interaction, current="sel":gratos_callback(i, current)
 
         back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
         back.callback = combinaison_callback
@@ -407,7 +408,7 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
                await(message.delete())
 
         emb = discord.Embed(title="Les ingrédients possibles pour une crêpe sucré", color=0x3498db)
-        emb.add_field(name="1 euro", value="- Sirop d'érable\n- Beurre de cacahuète\n- Nutella\n- Milka\n- Spécullos\n- Fraise (le fruit)\n- confiture d'Abricot\n- Miel\n- Caramel")
+        emb.add_field(name="1 euro", value="- Sirop d'érable\n- Beurre de cacahuète\n- Nutella\n- Milka\n- Spéculoos\n- Fraise (le fruit)\n- confiture d'Abricot\n- Miel\n- Caramel")
         emb.add_field(name="50 centimes", value="- Confiture de fraise/abricot\n- Banane")
         emb.add_field(name="gratuit", value="- Chantilly\n- Citron\n- Beurre\n- Toping")
         
@@ -415,9 +416,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         un_euro.callback = un_euro_sucre_callback
 
         cinquante_cent = discord.ui.Button(style=discord.ButtonStyle.primary, label="50 centimes", custom_id="cinquante_cent")
+        cinquante_cent.callback = cinquante_cent_sucre_callback
 
         gratos = discord.ui.Button(style=discord.ButtonStyle.primary, label="gratuit", custom_id="gratos")
-        gratos.callback = gratos_callback
+        gratos.callback = lambda i=interaction, current="sucre":gratos_callback(i, current)
 
         back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
         back.callback = combinaison_callback
@@ -470,15 +472,45 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
         cancel.callback = cancel_callback
 
-        ingredients = [emmental, chevre, poulet, jambon, minced, thon, saucisson, back, cancel]
+        ingredients = [maple_syrup, peanut_butter, nutella, milka, speculoos, strawberry, apricot_jam, honey, caramel, back, cancel]
 
-        un_euro_sale_view = discord.ui.View()
+        un_euro_sucre_view = discord.ui.View()
         for elt in ingredients:
-           un_euro_sale_view.add_item(elt)
+           un_euro_sucre_view.add_item(elt)
 
-        await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sale_view)
+        await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sucre_view)
 
-    async def gratos_callback(interaction : discord.Interaction):
+    async def cinquante_cent_sucre_callback(interaction : discord.Interaction):
+        list_messages = interaction.channel.history(limit = 1)
+        messages = []
+        
+        async for message in list_messages:
+            messages.append(message)
+
+        if len(messages) > 0:
+           for message in messages:
+               await(message.delete())
+        
+        strawb_apric_jam = discord.ui.Button(style=discord.ButtonStyle.primary, label="Confiture de fraise/abricot", custom_id="strawb_apric_jam")
+
+        banana = discord.ui.Button(style=discord.ButtonStyle.primary, label="Banane", custom_id="Banane")
+
+        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+        back.callback = sucre_callback
+
+        cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
+        cancel.callback = cancel_callback
+
+        ingredients = [strawb_apric_jam, banana, back, cancel]
+
+        cinquante_cent_sucre_view = discord.ui.View()
+        for elt in ingredients:
+           cinquante_cent_sucre_view.add_item(elt)
+
+        await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=cinquante_cent_sucre_view)
+
+
+    async def gratos_callback(interaction : discord.Interaction, before):
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -498,12 +530,15 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         toping = discord.ui.Button(style=discord.ButtonStyle.primary, label="Toping", custom_id="Toping")
 
         back = discord.ui.Button(style=discord.ButtonStyle.primary, label="retourner à l'étape précédente", custom_id="back")
-        back.callback = sale_callback
+        if before == "sel":
+            back.callback = sale_callback
+        else:
+            back.callback = sucre_callback
 
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
         cancel.callback = cancel_callback
 
-        ingredients = [chantilly, citron, butter, toping, back, cancel]
+        ingredients = [chantilly, lemon, butter, toping, back, cancel]
 
         gratos_view = discord.ui.View()
 
