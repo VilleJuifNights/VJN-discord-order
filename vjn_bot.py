@@ -110,7 +110,6 @@ def prettyDisplay(liste):
     emb = discord.Embed(title="Votre commande actuelle", description=contenu, color=0x3498db)
     return emb
 
-commande = []
 @tree.command(name="add_button", description="ajouter le bouton pour que les clients commandent")
 @app_commands.describe(identifiant="l'identifiant de la channel où mettre le bouton")
 async def add_button(interaction: discord.Interaction, identifiant: str):
@@ -119,6 +118,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
     async def button_callback(interaction: discord.Interaction):
         guild = interaction.guild
+        global crepe_combinaison, commande
+        crepe_combinaison = []
+        commande = []
         new_channel_name = "commande_" + str(identifiant_commande)
         new_channel = guild.channels[2]
         if interaction.channel_id == start_commande:
@@ -283,12 +285,16 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
         sucre = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe sucré", custom_id="sucre")
         sucre.callback = sucre_callback
-
+        
         sel = discord.ui.Button(style=discord.ButtonStyle.primary, label="Crêpe salé", custom_id="sel")
         sel.callback = sale_callback
 
-        back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
-        back.callback = crepe_callback
+        if crepe_combinaison == []:
+            back = discord.ui.Button(style=discord.ButtonStyle.primary, label="revenir au choix précédent", custom_id="back")
+            back.callback = crepe_callback
+        else:
+            finish = discord.ui.Button(style=discord.ButtonStyle.primary, label="finir la crêpe combinaison en cours", custom_id="finish")
+            finish.callback = lambda i=interaction, s="crêpe combinaison:["+", ".join(crepe_combinaison)+"]":show_callback(i, s)
 
         cancel = discord.ui.Button(style=discord.ButtonStyle.primary, label="annuler la commande", custom_id="cancel")
         cancel.callback = cancel_callback
@@ -297,7 +303,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         
         combinaison_view.add_item(sucre)
         combinaison_view.add_item(sel)
-        combinaison_view.add_item(back)
+        if crepe_combinaison == []:
+            combinaison_view.add_item(back)
+        else:
+            combinaison_view.add_item(finish)
         combinaison_view.add_item(cancel)
 
         await interaction.response.send_message("Veuillez choisir le type de crêpe combinaison que vous voulez", view=combinaison_view)
@@ -387,7 +396,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
         un_euro_sale_view = discord.ui.View()
         for elt in ingredients:
-           un_euro_sale_view.add_item(elt)
+            if elt != back and elt != cancel:
+                elt.callback = lambda i=interaction, ingredient=elt.label:add_ingredient_to_crepe_combinaison(i, ingredient)
+            un_euro_sale_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sale_view)
     
@@ -428,6 +439,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         cinquante_cent_sale_view = discord.ui.View()
 
         for elt in ingredients:
+            if elt != back and elt != cancel:
+                elt.callback = lambda i=interaction, ingredient=elt.label:add_ingredient_to_crepe_combinaison(i, ingredient)
+
             cinquante_cent_sale_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingrédient que tu veux ajouter à ta crêpe", view=cinquante_cent_sale_view)
@@ -519,7 +533,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
         un_euro_sucre_view = discord.ui.View()
         for elt in ingredients:
-           un_euro_sucre_view.add_item(elt)
+            if elt != back and elt != cancel:
+                elt.callback = lambda i=interaction, ingredient=elt.label:add_ingredient_to_crepe_combinaison(i, ingredient)
+
+            un_euro_sucre_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sucre_view)
 
@@ -551,7 +568,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
         cinquante_cent_sucre_view = discord.ui.View()
         for elt in ingredients:
-           cinquante_cent_sucre_view.add_item(elt)
+            if elt != back and elt != cancel:
+                elt.callback = lambda i=interaction, ingredient=elt.label:add_ingredient_to_crepe_combinaison(i, ingredient)
+
+            cinquante_cent_sucre_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=cinquante_cent_sucre_view)
 
@@ -592,9 +612,18 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         gratos_view = discord.ui.View()
 
         for elt in ingredients:
+            if elt != back and elt != cancel:
+                elt.callback = lambda i=interaction, ingredient=elt.label:add_ingredient_to_crepe_combinaison(i, ingredient)
             gratos_view.add_item(elt)
 
         await interaction.response.send_message("Choisis l'ingrédient que tu veux ajouter à ta crêpe", view=gratos_view)
+
+    async def add_ingredient_to_crepe_combinaison(interaction : discord.Interaction, ingredient):
+        crepe_combinaison.append(ingredient)
+        print(crepe_combinaison)
+        await combinaison_callback(interaction)
+        await interaction.followup.send(ingredient + " a bien ete ajouté à ta crêpe combinaison", ephemeral=True)
+
 
 
     async def cancel_callback(interaction : discord.Interaction):
