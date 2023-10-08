@@ -21,7 +21,13 @@ commandes = {}
 identifiant_commande = 1
 start_commande = 0
 
-@tree.command(name="order")
+####################################################################### 
+############### les lignes commentés ci-dessous étaient ################
+############## juste des tests pour que je sache comment ###############
+################### commencer a implémenter le bot #####################
+#######################################################################
+
+"""@tree.command(name="order")
 @app_commands.describe(choix="pour commander des trucs bons")
 @app_commands.choices(choix=[
     app_commands.Choice(name = "Crèpe usuelle", value = "crèpe usuelle"), 
@@ -82,9 +88,16 @@ async def validate(interaction: discord.Interaction, nombre:int):
         else:
             await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
     else:
-        await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")
+        await interaction.response.send_message("Je n'ai pas trouvé de commande portant ce numéro")"""
+
+##################################################################################### fin de mes tests du debut pour comprendre ################
+#################### comment implementer le bot ########################
+########################################################################
 
 def prettyDisplay(liste):
+    '''
+    affiche la commande du joueur chaque qu'il fait un choix
+    '''
     unique = []
     output = []
     contenu = ""
@@ -151,6 +164,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
     
     async def crepe_callback(interaction : discord.Interaction):
+        '''
+        affiche le menu des crepes
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -183,6 +199,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis le type de crêpe que tu veux", view=crepe_view)
     
     async def show_callback(interaction : discord.Interaction, information):
+        '''
+        montre la commande de l'utilisateur chaque fois au'il fait un choix
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -211,6 +230,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Que voulez-vous faire ?", embed=prettyDisplay(commande), view=commande_view)
     
     async def usuelle_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des crepes usuelles
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -246,6 +268,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
     
     async def combinaison_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des crepes combinaisons
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -279,6 +304,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
 
     async def sale_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des crepes combinaisons salées
+        '''
+
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -320,6 +349,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis les ingrédients que tu veux ajouter à ta crêpe", embed=emb, view=sale_view) 
     
     async def un_euro_sale_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des ingredients des crepes combinaisons salees a un euro
+        '''
+
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -359,6 +392,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sale_view)
     
     async def cinquante_cent_sale_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des ingredients des crepes combinaisons salees a cinquante centimes
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -397,6 +433,10 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis l'ingrédient que tu veux ajouter à ta crêpe", view=cinquante_cent_sale_view)
 
     async def sucre_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des crepes combinaisons sucres
+        '''
+
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -438,6 +478,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis les ingrédients que tu veux ajouter à ta crêpe", embed=emb, view=sucre_view) 
 
     async def un_euro_sucre_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des ingredients des crepes combinaisons sucres a un euro
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -481,6 +524,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
         await interaction.response.send_message("Choisis l'ingredient que tu veux ajouter à ta crêpe", view=un_euro_sucre_view)
 
     async def cinquante_cent_sucre_callback(interaction : discord.Interaction):
+        '''
+        montre le menu des ingredients des crepes combinaisons sucres a cinquante centimes
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -511,6 +557,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
 
     async def gratos_callback(interaction : discord.Interaction, before):
+        '''
+        montre le menu des ingredients des crepes combinaisons gratuit
+        '''
         list_messages = interaction.channel.history(limit = 1)
         messages = []
         
@@ -549,6 +598,9 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 
 
     async def cancel_callback(interaction : discord.Interaction):
+        '''
+        annule la commande en cours
+        '''
         guild = interaction.guild
         index = 0
         commande = []
@@ -572,13 +624,16 @@ async def add_button(interaction: discord.Interaction, identifiant: str):
 @tree.command(name="clear")
 @app_commands.describe(number="le nombre de message que tu veux supprimer")
 async def clear(interaction: discord.Interaction, number : int):
-        list_messages = interaction.channel.history(limit = number + 1)
-        messages = []
+    '''
+    une commande slash pour nous aider si on veut effacer rapidement plusieurs messages a la fois
+    '''
+    list_messages = interaction.channel.history(limit = number + 1)
+    messages = []
 
-        async for message in list_messages:
-            messages.append(message)
-        for message in messages:
-            await(message.delete())
+    async for message in list_messages:
+        messages.append(message)
+    for message in messages:
+        await(message.delete())
 
 
 
