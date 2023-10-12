@@ -1,0 +1,22 @@
+stand_open: true
+categories:
+  - name: Crêpes
+    id: crepes
+    emote: 🥞
+    toppings:
+      options:
+        - name: Nutella
+          price: 1.25
+        - name: Sucre
+          price: 0.5
+        - name: Citron
+          price: 0.5
+      recommandations:
+        - name: Sucre + Citron
+          price: 1.25
+
+  - name: Barbe à papa
+    id: barbe-a-papa
+    emote: 🍭
+    price: 1.5
+
