@@ -6,7 +6,7 @@ import discord
 from src.client import VJNClient
 from src.client import VJNClient, VJNInteraction
 from src.domain.entity.guildConfig import Config
-from src.orders.order.OrderButton import OrderTypeButton
+from src.commands.order.OrderTypeButton import OrderTypeButton
 
 
 async def order(interaction: VJNInteraction):
