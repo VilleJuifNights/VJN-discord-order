@@ -1,7 +1,7 @@
 stand_open: true
 categories:
-  - name: Crêpes
-    id: crepes
+  - name: Crêpes sucrées
+    id: crepes-sucrees
     emote: 🥞
     toppings:
       options:
@@ -13,6 +13,26 @@ categories:
           price: 0.5
       recommandations:
         - name: Sucre + Citron
+          price: 1.25
+  - name: Crêpes salées
+    id: crepes-salees
+    emote: 🥞
+    toppings:
+      options:
+        - name: Jambon
+          price: 1.25
+        - name: Fromage
+          price: 1.25
+        - name: Oeuf
+          price: 1.25
+        - name: Champignons
+          price: 1.25
+        - name: Complète
+          price: 1.25
+      recommandations:
+        - name: Jambon + Fromage
+          price: 1.25
+        - name: Complète
           price: 1.25
 
   - name: Barbe à papa

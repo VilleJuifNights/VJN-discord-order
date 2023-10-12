@@ -1,6 +1,6 @@
 from discord.app_commands import Command
 
-from src.actions import orders
+from src import orders
 
 commands = [
     {'command': Command(name="order", description="Order a meal", callback=orders.order)},
