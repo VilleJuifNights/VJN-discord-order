@@ -6,7 +6,7 @@ from discord.app_commands import Command
 from discord.state import ConnectionState
 from jsonschema.exceptions import ValidationError
 
-from src.domain.entity.guildConfig import Config
+from src.domain.entity.Config import Config
 from src.utils import setup_logging
 from . import error, events
 

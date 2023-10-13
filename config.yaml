@@ -3,37 +3,39 @@ categories:
   - name: Crêpes sucrées
     id: crepes-sucrees
     emote: 🥞
+    price: 1.5
     toppings:
       options:
         - name: Nutella
-          price: 1.25
+          extra: 1
         - name: Sucre
-          price: 0.5
+          extra: 0.5
         - name: Citron
-          price: 0.5
+          extra: 0.5
       recommandations:
         - name: Sucre + Citron
-          price: 1.25
+          extra: 1.25
   - name: Crêpes salées
     id: crepes-salees
     emote: 🥞
+    price: 1.5
     toppings:
       options:
         - name: Jambon
-          price: 1.25
+          extra: 1.25
         - name: Fromage
-          price: 1.25
+          extra: 1.25
         - name: Oeuf
-          price: 1.25
+          extra: 1.25
         - name: Champignons
-          price: 1.25
+          extra: 1.25
         - name: Complète
-          price: 1.25
+          extra: 1.25
       recommandations:
         - name: Jambon + Fromage
-          price: 1.25
+          extra: 1.25
         - name: Complète
-          price: 1.25
+          extra: 1.25
 
   - name: Barbe à papa
     id: barbe-a-papa
