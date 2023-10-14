@@ -1,0 +1,48 @@
+settings:
+  stand_open: true
+  channel: 1034390937071259708
+
+
+categories:
+  - name: Crêpes sucrées
+    id: crepes-sucrees
+    emote: 🥞
+    price: 1.5
+    toppings:
+      options:
+        - name: Nutella
+          extra: 1
+        - name: Sucre
+          extra: 0.5
+        - name: Citron
+          extra: 0.5
+      recommandations:
+        - name: Sucre + Citron
+          extra: 1.25
+  - name: Crêpes salées
+    id: crepes-salees
+    emote: 🥞
+    price: 1.5
+    toppings:
+      options:
+        - name: Jambon
+          extra: 1.25
+        - name: Fromage
+          extra: 1.25
+        - name: Oeuf
+          extra: 1.25
+        - name: Champignons
+          extra: 1.25
+        - name: Complète
+          extra: 1.25
+      recommandations:
+        - name: Jambon + Fromage
+          extra: 1.25
+        - name: Complète
+          extra: 1.25
+
+  - name: Barbe à papa
+    id: barbe-a-papa
+    emote: 🍭
+    price: 1.5
+
