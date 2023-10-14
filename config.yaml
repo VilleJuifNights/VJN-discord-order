@@ -1,4 +1,8 @@
-stand_open: true
+settings:
+  stand_open: true
+  channel: 1034390937071259708
+
+
 categories:
   - name: Crêpes sucrées
     id: crepes-sucrees

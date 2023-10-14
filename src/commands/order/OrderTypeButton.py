@@ -42,7 +42,7 @@ async def choose_toppings(interaction: VJNInteraction, category: Category, selec
     @param selected_choices:  List of selected choices
     """
     selected_choices = selected_choices or []
-    embed, view = get_order_ui(category)
+    embed, view = get_order_ui(category, selected_choices)
 
     if selected_choices:
         embed.add_field(name="Toppings", value=", ".join([choice.name for choice in selected_choices]))

@@ -48,4 +48,4 @@ async def errors(interaction: discord.Interaction, error: AppCommandError):
             _log.error(f"User {interaction.user} blocked the bot, could not send error message")
     except discord.errors.InteractionResponded:  # interaction already responded
         pass
-    _log.error(f"Error {id_err}: {message}")
+    _log.error(f"Error {id_err}: {message}, {error}")

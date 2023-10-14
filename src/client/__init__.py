@@ -43,7 +43,7 @@ class VJNClient(discord.Client):
 
     async def on_ready(self):
         _log.info(f'{self.user} has connected to Discord!')
-        await self.tree.sync()
+        # await self.tree.sync()
         # await self.tree.sync(guild=discord.Object(id=1033684799912677388))  # TODO: change ID
         commands = await self.tree.fetch_commands()
         _log.info(f"Global commands available: {', '.join([f'{command.name}' for command in commands])}")

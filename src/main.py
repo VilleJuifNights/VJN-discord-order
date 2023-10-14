@@ -4,6 +4,13 @@ import os
 import client
 from client import commands
 from utils import setup_logging
+from src.data import engine
+
+
+session = engine.Session()
+
+
+
 
 client = client.VJNClient()
 client.add_commands(commands.commands)

@@ -1,8 +1,10 @@
 import discord.ui
-from discord import Interaction, ButtonStyle
+from discord import Interaction, ButtonStyle, Colour
 
 from src.client import VJNInteraction
+from src.data.utils import create_order, get_session
 from src.domain.entity.Config import Category, Toppings, Choice
+from src.domain.service.OrderService import new_order
 
 
 class SubmitButton(discord.ui.Button):
@@ -13,8 +15,24 @@ class SubmitButton(discord.ui.Button):
         self.toppings = toppings or []
 
     async def callback(self, interaction: VJNInteraction):
+        await interaction.response.defer(ephemeral=True)
+        order = create_order(interaction.user, self.category, self.toppings)
+        session = get_session()
+        session.add(order)
+        session.commit()
+
+        embed = discord.Embed(title="Résumé de votre commande", color=Colour.blue())
+        embed.add_field(name="Catégorie", value=self.category.name, inline=False)
         if self.toppings:
-            message = f"Order {self.category.name} with {', '.join([topping.name for topping in self.toppings])}"
-        else:
-            message = f"Order {self.category.name}"
-        await interaction.response.send_message(message, ephemeral=True)
+            embed.add_field(name="Toppings", value="\n".join([topping.name for topping in self.toppings]), inline=False)
+        embed.add_field(name="Prix", value=f"{order.total_cost}€" if order.total_cost > 0 else "Gratuit", inline=False)
+        embed.set_footer(text=f"Commande #{order.pretty_id}")
+
+        embed.description = "Votre commande a bien été prise en compte !"
+        if order.total_cost > 0:
+            embed.description += f"\nDirigez vous vers un membre du staff pour payer votre commande."
+
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+        await new_order(interaction.client, order)
+

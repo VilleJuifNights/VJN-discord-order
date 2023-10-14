@@ -26,5 +26,11 @@ class Category(BaseModel):
     toppings: Optional[Toppings] = Field(None, description="Toppings of the category")
 
 
+class Settings(BaseModel):
+    stand_open: bool = Field(..., description="Whether the stand is open or not")
+    channel: int = Field(..., description="Id of the channel where to put new orders")
+
+
 class Config(BaseModel):
     categories: List[Category] = Field(..., description="List of categories")
+    settings: Settings = Field(..., description="Settings of the bot")
