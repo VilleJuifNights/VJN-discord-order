@@ -65,6 +65,8 @@ class ChangeStatusButton(discord.ui.Button):
                 await interaction.followup.send(f"Impossible de contacter l'utilisateur {order.user_id} pour lui "
                                                 f"annoncer que sa commande #{order.pretty_id} est en cours de "
                                                 f"préparation.")
+            except ValueError:
+                pass
 
         await interaction.message.edit(embed=embed, view=view)
 
@@ -76,3 +78,5 @@ class ChangeStatusButton(discord.ui.Button):
             except discord.NotFound or discord.Forbidden:
                 await interaction.followup.send(f"Impossible de contacter l'utilisateur {order.user_id} pour lui "
                                                 f"annoncer que sa commande #{order.pretty_id} est prête.")
+            except ValueError:
+                pass

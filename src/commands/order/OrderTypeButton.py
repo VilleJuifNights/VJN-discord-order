@@ -20,8 +20,8 @@ class OrderTypeButton(discord.ui.Button):
     async def callback(self, interaction: VJNInteraction):
         if not self.category.toppings:  # No choices
             embed, view = get_order_ui(self.category, login=self.login)
-            view = discord.ui.View()
             embed.add_field(name="Total", value=f"{self.category.price}€")
+            await interaction.message.delete()
             await interaction.response.send_message(embed=embed, view=view)
         else:
             await choose_toppings(interaction, self.category, self.selected_choices, self.login)
@@ -56,10 +56,10 @@ async def choose_toppings(interaction: VJNInteraction, category: Category, selec
     embed.add_field(name="Total", value=f"{category.price + sum([choice.extra for choice in selected_choices])}€")
 
     opt = [(choice, choice in selected_choices) for choice in category.toppings.options]
-    view.add_item(ChoiceSelection("Suppléments", category, opt, True))
+    view.add_item(ChoiceSelection("Suppléments", category, opt, True, login=login))
 
     opt = [(choice, choice in selected_choices) for choice in category.toppings.recommandations]
-    view.add_item(ChoiceSelection("Recommandations", category, opt, False))
+    view.add_item(ChoiceSelection("Recommandations", category, opt, False, login=login))
 
     await interaction.message.delete()
     await interaction.response.send_message(embed=embed, view=view)
