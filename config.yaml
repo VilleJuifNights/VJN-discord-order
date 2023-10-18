@@ -1,6 +1,7 @@
 settings:
-  stand_open: true
-  channel: 1034390937071259708
+  stand_open: false
+  validated_channel: 1163945417977905182
+  non_validated_channel: 1034390937071259708
 
 
 categories:

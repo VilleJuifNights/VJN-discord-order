@@ -5,18 +5,25 @@ from src.client import VJNInteraction
 from src.data.utils import create_order, get_session
 from src.domain.entity.Config import Category, Toppings, Choice
 from src.domain.service.OrderService import new_order
+from uuid import uuid4
 
 
 class SubmitButton(discord.ui.Button):
 
-    def __init__(self, category: Category, toppings: list[Choice] = None):
-        super().__init__(label="Submit", custom_id=f"order_{category.name}_submit", style=ButtonStyle.green)
+    def __init__(self, category: Category, toppings: list[Choice] = None, login: str = None):
+
+        super().__init__(label="Submit", custom_id=f"order_{category.name}_submit_{uuid4()}", style=ButtonStyle.green)
         self.category = category
         self.toppings = toppings or []
+        self.login = login
 
     async def callback(self, interaction: VJNInteraction):
         await interaction.response.defer(ephemeral=True)
-        order = create_order(interaction.user, self.category, self.toppings)
+        if self.login:
+            order = create_order(self.login, self.category, self.toppings)
+        else:
+            order = create_order(interaction.user, self.category, self.toppings)
+
         session = get_session()
         session.add(order)
         session.commit()
@@ -32,7 +39,7 @@ class SubmitButton(discord.ui.Button):
         if order.total_cost > 0:
             embed.description += f"\nDirigez vous vers un membre du staff pour payer votre commande."
 
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        await interaction.message.delete()
+        await interaction.followup.send(embed=embed)
 
         await new_order(interaction.client, order)
-

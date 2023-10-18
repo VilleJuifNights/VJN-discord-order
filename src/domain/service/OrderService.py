@@ -25,16 +25,16 @@ async def new_order(client: VJNClient, order: Order):
         embed.add_field(name="Utilisateur", value=f"{user.mention} ({user.name}#{user.discriminator})", inline=False)
     except discord.NotFound:
         embed.add_field(name="Utilisateur", value=f"User: {order.user_id}", inline=False)
+    except ValueError:
+        embed.add_field(name="Utilisateur", value=f"User: {order.user_id}", inline=False)
 
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=None)
     view.add_item(ChangeStatusButton(order.id, OrderStatus.PAYED if order.total_cost > 0 else OrderStatus.IN_PROGRESS))
 
-    channel = client.get_channel(client.config.settings.channel)
+    channel = client.get_channel(client.config.settings.non_validated_channel)
 
     if channel is None:
-        _log.error("Could not find channel with ID %d", client.config.settings.channel)
+        _log.error("Could not find channel with ID %d", client.config.settings.non_validated_channel)
         return
 
     await channel.send(embed=embed, view=view)
-
-

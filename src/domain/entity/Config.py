@@ -28,7 +28,8 @@ class Category(BaseModel):
 
 class Settings(BaseModel):
     stand_open: bool = Field(..., description="Whether the stand is open or not")
-    channel: int = Field(..., description="Id of the channel where to put new orders")
+    non_validated_channel: int = Field(..., description="Id of the channel where to put new orders")
+    validated_channel: int = Field(..., description="Id of the channel where to put validated orders")
 
 
 class Config(BaseModel):

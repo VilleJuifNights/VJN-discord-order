@@ -5,10 +5,15 @@ from discord._types import ClientT
 from discord.app_commands import Command
 from discord.state import ConnectionState
 from jsonschema.exceptions import ValidationError
+from sqlalchemy import select
 
 from src.domain.entity.Config import Config
 from src.utils import setup_logging
 from . import error, events
+from src.commands.order.OrderStatusChange import ChangeStatusButton
+from src.data.models import Order
+from src.data.utils import get_session
+from src.domain.entity.OrderStatus import OrderStatus, next_status
 
 _log = setup_logging(__name__)
 
@@ -26,7 +31,7 @@ class VJNClient(discord.Client):
 
         self.tree.add_command(
             Command(name="update", description="Update commands (Admin only)", callback=self.updateCommands),
-            guilds=[discord.Object(id=1033684799912677388), discord.Object(id=1130274409152778240)])
+            guilds=[discord.Object(id=1033684799912677388)])
 
     @staticmethod
     def __load_config() -> Config:
@@ -44,19 +49,31 @@ class VJNClient(discord.Client):
     async def on_ready(self):
         _log.info(f'{self.user} has connected to Discord!')
         # await self.tree.sync()
-        # await self.tree.sync(guild=discord.Object(id=1033684799912677388))  # TODO: change ID
+
         commands = await self.tree.fetch_commands()
         _log.info(f"Global commands available: {', '.join([f'{command.name}' for command in commands])}")
         await self.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.watching, name="0 orders in the queue"))
+            activity=discord.Activity(type=discord.ActivityType.playing, name="/order"))
 
-        guilds = self.guilds
-        for guild in guilds:
-            print(guild.name)
+        self.regenerate_payment_views()
+
+    def regenerate_payment_views(self):
+        session = get_session()
+
+        orders = session.execute(select(Order).where(Order.status != OrderStatus.RETRIEVED)).scalars().all()
+        for order in orders:
+            view = discord.ui.View(timeout=None)
+            view.add_item(ChangeStatusButton(order.id, next_status(order.status)))
+            self.add_view(view)
 
     async def updateCommands(self, interaction: discord.Interaction):
+        await interaction.response.defer(thinking=True)
         await self.tree.sync()
+        # await self.tree.sync(guild=discord.Object(id=1033684799912677388))  # TODO: change ID
+        # await self.tree.sync(guild=discord.Object(id=890357045138690108))  # TODO: change ID
         self.config = self.__load_config()
+
+        _log.info(f"Loaded config file")
 
         await interaction.followup.send("Done updating commands and configuration")
 
