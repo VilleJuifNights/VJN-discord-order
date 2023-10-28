@@ -27,13 +27,19 @@ class OrderTypeButton(discord.ui.Button):
             await choose_toppings(interaction, self.category, self.selected_choices, self.login)
 
 
-def get_order_ui(category: Category, toppings: list[Choice] = None, login: str = None) \
+def get_order_ui(category: Category, selected_choices: list[Choice] = None, login: str = None) \
         -> Tuple[discord.Embed, discord.ui.View]:
     embed = discord.Embed(title="Order", description="Order a meal", color=discord.Color.green())
     embed.add_field(name="Category", value=category.name)
 
     view = discord.ui.View()
-    view.add_item(SubmitButton(category=category, toppings=toppings, login=login))
+    button = SubmitButton(category=category, toppings=selected_choices, login=login)
+    # check if number of choice are between min and max (max can be -1 for unlimited), else disable button
+    nb_choices = len(selected_choices or [])
+    if (category.toppings.min_choices > nb_choices or nb_choices > category.toppings.max_choices) and category.toppings.max_choices != -1:
+        button.disabled = True
+
+    view.add_item(button)
 
     return embed, view
 
@@ -56,10 +62,12 @@ async def choose_toppings(interaction: VJNInteraction, category: Category, selec
     embed.add_field(name="Total", value=f"{category.price + sum([choice.extra for choice in selected_choices])}€")
 
     opt = [(choice, choice in selected_choices) for choice in category.toppings.options]
-    view.add_item(ChoiceSelection("Suppléments", category, opt, True, login=login))
+    if opt:
+        view.add_item(ChoiceSelection("Suppléments", category, opt, True, login=login))
 
     opt = [(choice, choice in selected_choices) for choice in category.toppings.recommandations]
-    view.add_item(ChoiceSelection("Recommandations", category, opt, False, login=login))
+    if opt:
+        view.add_item(ChoiceSelection("Recommandations", category, opt, False, login=login))
 
     await interaction.message.delete()
     await interaction.response.send_message(embed=embed, view=view)
@@ -79,7 +87,7 @@ class ChoiceSelection(discord.ui.Select):
         self.category = category
         self.choices = choices
         self.login = login
-        min_values = 0 if multiple_choices else 1
+        min_values = 0
         max_values = min(len(self.choices), 25) if multiple_choices else 1
         super().__init__(placeholder=placeholder, max_values=max_values, min_values=min_values)
         for opt in self.choices:

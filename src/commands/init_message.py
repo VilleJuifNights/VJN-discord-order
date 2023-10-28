@@ -1,7 +1,7 @@
 import discord
 from discord import Interaction
 
-from src.commands.order import order2
+from src.commands.order import init_order
 
 
 class InitOrderView(discord.ui.View):
@@ -12,7 +12,7 @@ class InitOrderView(discord.ui.View):
 
     @discord.ui.button(label="Commander", style=discord.ButtonStyle.green, custom_id="start_order", emoji="🍔")
     async def start_order(self, interaction: Interaction, button: discord.ui.Button):
-        await order2(interaction, self.client)
+        await init_order(interaction, self.client)
 
 
 async def init_message(interaction: Interaction):

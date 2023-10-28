@@ -49,7 +49,7 @@ async def remove_product(interaction: VJNInteraction, product: Optional[str]):
         interaction.client.config = config
         with open("config.yaml", "w") as f:
             f.write(yaml.dump(config.model_dump()))
-        await interaction.response.send_message(f"Le produit `{cat.name}` a été supprimé", ephemeral=True)
+        await interaction.response.send_message(f"Le produit `{product}` a été supprimé", ephemeral=True)
     else:
         await interaction.response.send_message(f"Le produit `{product}` n'existe pas", ephemeral=True)
 

@@ -5,10 +5,12 @@ from src.client import VJNInteraction, VJNClient
 from src.commands.order.OrderTypeButton import OrderTypeButton
 from src.domain.entity.Config import Config
 
-async def order(interaction: VJNInteraction):
-    await order2(interaction, interaction.client)
 
-async def order2(interaction: Interaction, client: VJNClient):
+async def order(interaction: VJNInteraction):
+    await init_order(interaction, interaction.client)
+
+
+async def init_order(interaction: Interaction, client: VJNClient):
     embed = discord.Embed(title="Order", description="Order a meal", color=discord.Color.green())
     embed.description = "Que souhaitez vous commander ?"
     view = discord.ui.View()
@@ -28,7 +30,8 @@ async def order2(interaction: Interaction, client: VJNClient):
     try:
         await interaction.user.send(embed=embed, view=view)
     except discord.Forbidden:
-        await interaction.response.send_message("Impossible de vous envoyer un message privé ! Vérifiez vos paramètres de confidentialité.", ephemeral=True)
+        await interaction.response.send_message(
+            "Impossible de vous envoyer un message privé ! Vérifiez vos paramètres de confidentialité.", ephemeral=True)
         return
 
     # check if interaction comes from a private message
@@ -36,6 +39,3 @@ async def order2(interaction: Interaction, client: VJNClient):
         await interaction.response.send_message("Que souhaitez vous commander ?")
     else:
         await interaction.response.send_message("Regardez vos messages privés !", ephemeral=True)
-
-
-
